@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stylish Chat App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-green-100 to-blue-200 min-h-screen flex flex-col items-center justify-start p-4 font-sans">
+
+    <h1 class="font-extrabold text-green-600 text-4xl text-center mt-8 drop-shadow-md">
+        Tamanana-ChatBox
+    </h1>
+    
+    <h2 class="font-semibold text-2xl text-center mt-3 text-gray-700" id="logo">
+        Chat App using Socket.io
+    </h2>
+
+    <form class="w-full max-w-md bg-white shadow-lg rounded-lg p-6 mt-6 flex flex-col space-y-4" id="form">
+        <input class="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-200" 
+               type="text" 
+               placeholder="Enter your name" 
+               id="myname" required>
+        <input class="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none transition duration-200" 
+               type="text" 
+               placeholder="Type your message" 
+               id="message" required>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition duration-200">
+            Send
+        </button>
+    </form>
+
+    <div class="w-full max-w-md mt-6 space-y-2" id="messageArea">
+        <!-- Messages appear here -->
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = io();
+        let form = document.getElementById('form');
+        let myname = document.getElementById('myname');
+        let message = document.getElementById('message');
+        let messageArea = document.getElementById("messageArea");
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            if (message.value.trim()) {
+                socket.emit('send name', myname.value.trim());
+                socket.emit('send message', message.value.trim());
+                message.value = "";
+            }
+        });
+
+        socket.on("send name", (username) => {
+            let name = document.createElement("p");
+            name.className = "bg-gray-800 text-white text-center py-1 px-2 rounded-md shadow";
+            name.textContent = username + ":";
+            messageArea.appendChild(name);
+        });
+
+        socket.on("send message", (chat) => {
+            let chatContent = document.createElement("p");
+            chatContent.className = "bg-white text-gray-800 px-4 py-2 rounded shadow-md border";
+            chatContent.textContent = chat;
+            messageArea.appendChild(chatContent);
+        });
+    </script>
+
+</body>
+</html>
